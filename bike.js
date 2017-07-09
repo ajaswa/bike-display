@@ -1,32 +1,31 @@
-var rpio = require('rpio');
-var Lcd = require('lcd');
+const rpio = require('rpio');
+const Lcd = require('lcd');
 
-var lcd = new Lcd({
-    rs: 12,
-    e: 21,
-    data: [5, 6, 17, 18],
-    cols: 16,
-    rows: 2
-  });
+const lcd = new Lcd({
+  rs: 12,
+  e: 21,
+  data: [5, 6, 17, 18],
+  cols: 16,
+  rows: 2,
+});
 
-rpio.open(37, rpio.INPUT, rpio.PULL_DOWN);
 
-var count=0;
-var totalDist=0;
-var delta=0;
-var totalTime = 0;
+let count = 0;
+let totalDist = 0;
+let delta = 0;
+let totalTime = 0;
 
-var idleTimer;
-var prevTime = Date.now();
-var curTime = Date.now();
-var revDistance = 4167;
-var revDev = 1000000;
-var calcDistance = revDistance/revDev;
-var stopped = false;
+let idleTimer;
+let prevTime = Date.now();
+let curTime = Date.now();
+const revDistance = 4167;
+const revDev = 1000000;
+const calcDistance = revDistance / revDev;
+let stopped = false;
 
-function resetTimer(){
+function resetTimer() {
   clearTimeout(idleTimer);
-  idleTimer = setTimeout(function(){
+  idleTimer = setTimeout(() => {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print('Stopped!');
@@ -34,9 +33,11 @@ function resetTimer(){
   }, 2500);
 }
 
-resetTimer();
 
-lcd.on('ready', function() {
+lcd.on('ready', () => {
+  rpio.open(37, rpio.INPUT, rpio.PULL_DOWN);
+  resetTimer();
+
   function pollcb(pin) {
     if (rpio.read(pin)) {
       if (stopped) {
@@ -48,41 +49,38 @@ lcd.on('ready', function() {
       }
       curTime = Date.now();
       delta = curTime - prevTime;
-      count++;
+      count += 1;
       totalDist += revDistance;
-      totalTime +=delta;
-      
-      var date = new Date(totalTime);
-      var hours = date.getHours();
-      var minutes = date.getMinutes();
-      var seconds = date.getSeconds();
-      var instHours = (delta / (1000 * 60 * 60));
-                  
-//     console.log('rev:', count);
+      totalTime += delta;
+
+      const date = new Date(totalTime);
+      const hours = date.getHours();
+      const minutes = date.getMinutes();
+      const seconds = date.getSeconds();
+      const instHours = (delta / (1000 * 60 * 60));
 
       lcd.clear();
       lcd.setCursor(0, 0);
-      lcd.print('Miles: '+(totalDist/1000000).toFixed(4));
+      lcd.print(`Miles: ${(totalDist / 1000000).toFixed(4)}`);
 
-      lcd.once('printed', function(){
-
+      lcd.once('printed', () => {
         lcd.setCursor(0, 1);
         if (count % 5) {
-          lcd.print('Time:  '+hours+':'+minutes+':'+seconds);
+          lcd.print(`Time:  ${hours}:${minutes}:${seconds}`);
         } else {
-          lcd.print('MPH:   '+ (calcDistance/instHours).toFixed(2));
+          lcd.print(`MPH:   ${(calcDistance / instHours).toFixed(2)}`);
         }
       });
 
       resetTimer();
     }
-    prevTime=curTime;
+    prevTime = curTime;
   }
   rpio.poll(37, pollcb);
-
 });
-process.on('SIGINT', function() {
-rpio.close(37);
+
+process.on('SIGINT', () => {
+  rpio.close(37);
   lcd.clear();
   lcd.close();
   process.exit();
