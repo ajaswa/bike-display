@@ -2,7 +2,7 @@
 
 Display for my DeskCycle underdesk bike.
 
-##Parts
+## Parts
 - Raspberry Pi 3
 - 16x2 lcd (https://www.sparkfun.com/products/9052)
 - 1kOhm resister
