@@ -15,3 +15,5 @@ The deskcycle has two "data" ports, 3.5mm headphone jack and plug. This is essen
 
 
 ![bike-display](https://user-images.githubusercontent.com/57323/28003659-78de02ca-64fc-11e7-8d21-3cf898f52063.gif)
+
+![bike-display_bb](https://user-images.githubusercontent.com/57323/28039704-8154d486-6580-11e7-83da-43f9fde7ef46.png)
